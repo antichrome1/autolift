@@ -15,10 +15,8 @@ Run on system boot:
 - Navigate to System Settings -> General -> Login Items
 - Click `+` and select the autolift executable
 
-## License
+## Metadata
 
-No AI agents/tools were/are used in this project.
-
-Copyright (c) 2026 Aditya Singh <antichrome1@proton.me>
-
-SPDX-License-Identifier: ISC
+License: ISC<br>
+AI usage: No AI agents/tools were/are used in this project.<br>
+Contact: Aditya Singh <antichrome1@proton.me>
