@@ -2,7 +2,12 @@
 
 Autofocus and lift windows on mouse hover.
 
-Compile and run:
+Install pre-built binary:
+```console
+mise use -g github:antichrome1/autolift@0.9.0
+```
+
+Or, build from source:
 ```console
 $ swiftc autolift.swift -O
 $ ./autolift             # default 1s delay until lift
