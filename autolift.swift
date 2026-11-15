@@ -1,5 +1,6 @@
 import Cocoa
 import ApplicationServices
+import Foundation
 
 // NOTE: If ~/.autolift exists, read it into `delayMs`, else default to 1000
 let delayMs = Double(try String(contentsOfFile: NSHomeDirectory() + "/.autolift", encoding: .utf8)) ?? 1000
@@ -106,5 +107,73 @@ Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
     if let r = windowUnder(p) { raise(r.win, r.pid) }
 }
 
+if CommandLine.arguments.contains("--test") {
+    exit(runAllTests())
+}
+
 print("autolift running, delay \(Int(delayMs)) ms. Ctrl+C to quit.")
 RunLoop.main.run()
+
+// TESTS
+
+func assertTest(_ condition: Bool, _ name: String) -> Bool {
+    print("\(condition ? "PASS" : "FAIL"): \(name)")
+    return condition
+}
+
+func testAxAttrMissingAttributeReturnsNil() -> Bool {
+    let app = AXUIElementCreateApplication(getpid())
+    return assertTest(axAttr(app, "AXDoesNotExistAttribute") == nil,
+                      "axAttr returns nil for a nonexistent attribute")
+}
+
+func testAxPointMissingAttributeReturnsNil() -> Bool {
+    let app = AXUIElementCreateApplication(getpid())
+    return assertTest(axPoint(app, "AXDoesNotExistAttribute") == nil,
+                      "axPoint returns nil when attribute is missing")
+}
+
+func testAxSizeMissingAttributeReturnsNil() -> Bool {
+    let app = AXUIElementCreateApplication(getpid())
+    return assertTest(axSize(app, "AXDoesNotExistAttribute") == nil,
+                      "axSize returns nil when attribute is missing")
+}
+
+func testEnableAXRecordsPidOnce() -> Bool {
+    let pid = getpid()
+    enableAX(pid)
+    let countAfterFirst = enabledPids.count
+    enableAX(pid)
+    let ok1 = assertTest(enabledPids.contains(pid),
+                         "enableAX records the pid")
+    let ok2 = assertTest(enabledPids.count == countAfterFirst,
+                         "enableAX does not duplicate an already-enabled pid")
+    return ok1 && ok2
+}
+
+func testWindowUnderFarOffscreenReturnsNil() -> Bool {
+    let result = windowUnder(NSPoint(x: -1_000_000, y: -1_000_000))
+    return assertTest(result == nil,
+                      "windowUnder returns nil for a point far off every screen")
+}
+
+func testRaiseInvalidPidDoesNotCrash() -> Bool {
+    // Should silently fail rather than crash.
+    raise(systemWide, 999_999)
+    return assertTest(true, "raise handles an invalid pid without crashing")
+}
+
+func runAllTests() -> Int32 {
+    let tests: [() -> Bool] = [
+        testAxAttrMissingAttributeReturnsNil,
+        testAxPointMissingAttributeReturnsNil,
+        testAxSizeMissingAttributeReturnsNil,
+        testEnableAXRecordsPidOnce,
+        testWindowUnderFarOffscreenReturnsNil,
+        testRaiseInvalidPidDoesNotCrash,
+    ]
+    let results = tests.map { $0() }
+    let passed = results.filter { $0 }.count
+    print("\(passed)/\(results.count) tests passed")
+    return passed == results.count ? 0 : 1
+}
