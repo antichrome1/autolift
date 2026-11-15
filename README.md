@@ -20,8 +20,7 @@ Run on system boot:
 - Navigate to System Settings -> General -> Login Items
 - Click `+` and select the autolift executable
 
-## Metadata
+## License
 
-License: ISC<br>
+ISC © 2026 Aditya Singh <antichrome1@proton.me> <br>
 AI usage: No AI agents/tools were/are used in this project.<br>
-Contact: Aditya Singh <antichrome1@proton.me>
