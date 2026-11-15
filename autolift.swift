@@ -3,7 +3,13 @@ import ApplicationServices
 import Foundation
 
 // NOTE: If ~/.autolift exists, read it into `delayMs`, else default to 1000
-let delayMs = Double(try String(contentsOfFile: NSHomeDirectory() + "/.autolift", encoding: .utf8)) ?? 1000
+func readConfigFile(default fallback: Double = 1000) -> Double {
+    let path = NSHomeDirectory() + "/.autolift"
+    let text = try? String(contentsOfFile: path, encoding: .utf8)
+    return text.flatMap { Double($0.trimmingCharacters(in: .whitespacesAndNewlines)) } ?? fallback
+}
+
+let delayMs = readConfigFile()
 
 let trustOpts = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
 guard AXIsProcessTrustedWithOptions(trustOpts) else {
