@@ -4,7 +4,7 @@ Autofocus and lift windows on mouse hover.
 
 Install pre-built binary:
 ```console
-mise use -g github:antichrome1/autolift@0.9.0
+mise use -g github:antichrome1/autolift@v0.9.1
 ```
 
 Or, build from source:
